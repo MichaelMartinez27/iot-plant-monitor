@@ -1,0 +1,24 @@
+services:
+  mqtt:
+    hostname: mosquitto
+    container_name: mosquitto
+    image: eclipse-mosquitto
+    ports:
+      - 9001:9001
+      - 1883:1883
+    volumes:
+      - ./local-mqtt/config/:/mosquitto/config/ 
+      - ./local-mqtt/data:/mosquitto/data 
+      - ./local-mqtt/log:/mosquitto/log 
+  db:
+    hostname: py-storage
+    container_name: py-storage
+    build:
+      dockerfile: ./store.Dockerfile
+      context: .
+    volumes:
+      - "./:/code"
+    env_file:
+      - .env
+    # command: ["sleep","10000"]
+    # command: pip install --upgrade --user -qqq pip &&  pip install --upgrade --user -qqq paho-mqtt && sleep 3000 # && python /code/data_storage.py
