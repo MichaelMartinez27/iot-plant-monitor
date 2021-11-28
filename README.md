@@ -14,7 +14,8 @@
 [x] save incoming data to local sqlite3 db  
 
 ## Analyze Data
-[ ] subscribe to local mosquitto pub/sub
-[ ] 
-[ ] 
+[ ] subscribe to local mosquitto pub/sub  
+[ ] Analysis algorithm  
+[ ] results get handled and sends results to ubidots  
+[ ] ubidot sends notification when anomoly is detected  
 

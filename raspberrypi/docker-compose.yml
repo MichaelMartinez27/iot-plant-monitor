@@ -19,6 +19,4 @@ services:
     volumes:
       - "./:/code"
     env_file:
-      - .env
-    # command: ["sleep","10000"]
-    # command: pip install --upgrade --user -qqq pip &&  pip install --upgrade --user -qqq paho-mqtt && sleep 3000 # && python /code/data_storage.py
+      - store.env
