@@ -3,9 +3,9 @@
 
 ## Bluetooth Sensor Data
 [ ] arduino sensors set-up  
-[ ] arduino BLE sending data  
-[ ] recieve sensor data via python bluetooth  
-[ ] publish sensor data to local mosquitto pub/sub  
+[x] arduino BLE sending data  
+[x] recieve sensor data via python bluetooth  
+[x] publish sensor data to local mosquitto pub/sub  
 
 ## Store Data
 [x] create schema  

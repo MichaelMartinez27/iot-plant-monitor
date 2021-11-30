@@ -7,19 +7,66 @@ Course:  ELEC 3520
 
 """
 from time import sleep
-from typing import Counter
-import paho.mqtt.client as mqtt
+import asyncio
+from bleak import BleakClient
+from struct import *
+# import paho.mqtt.client as mqtt
 
 
-topic = "sensors/sensor/S01"
+ADDRESS = "6d:65:61:d3:ca:be"
+UUID_DESCRIPTORS = {
+    "2a6f":"HUMID",
+    "2a6e":"TEMP",
+    "272a":"SOIL",
+    "2730":"LIGHT"
+}
+PREVIOUS_DATA = {
+    "2a6f":0,
+    "2a6e":0,
+    "272a":0,
+    "2730":0
+}
+
+
+def send_sensor_data(topic:str, payload:str):
+    print(f"{topic:>20}: {payload.replace(',','|')}")
+    # send to mqtt
+    # client = mqtt.Client(protocol=mqtt.MQTTv311)
+    # client.connect(host="localhost", port=1883)
+    # Counter = 40
+    # while True:
+    #     client.publish(topic=topic, payload=f"P001|{Counter}|100|ft")
+    #     sleep(10)
+    #     Counter += 2
+
+
+
+async def get_sensor_data(ADDRESS:str):
+    async with BleakClient(ADDRESS) as client:
+        svcs = await client.get_services()
+        while True:
+            try:
+                for svc in svcs:
+                    if svc.description == "Serial Port":
+                        for char in svc.characteristics:
+                            char_uuid = char.uuid[4:8]
+                            char_description = UUID_DESCRIPTORS[char_uuid]
+                            data = await client.read_gatt_char(char.handle)
+                            char_data = unpack('f',data)[0]
+                            if data != PREVIOUS_DATA[char_uuid]:
+                                send_sensor_data(
+                                    f"sensors/sensor/{char_uuid}",
+                                    f"P001,{char_description:<5},{char_data}"
+                                )
+                                PREVIOUS_DATA[char_uuid] = data
+                sleep(1)
+            except KeyboardInterrupt:
+                break
+
+
+def main():
+    asyncio.run(get_sensor_data(ADDRESS))
 
 
 if __name__ == "__main__":
-    client = mqtt.Client(protocol=mqtt.MQTTv311)
-    client.connect(host="localhost", port=1883)
-    Counter = 40
-    while True:
-        client.publish(topic=topic, payload=f"P001|{Counter}|100|ft")
-        sleep(10)
-        Counter += 2
-
+    main()
