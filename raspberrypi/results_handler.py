@@ -5,3 +5,7 @@ Author:  Michael Martinez
 Course:  ELEC 3520
 
 """
+
+
+def send_result():
+    pass

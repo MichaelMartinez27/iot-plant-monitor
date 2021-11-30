@@ -6,16 +6,15 @@ on a mobile phone
 #include <ArduinoBLE.h>
 
 
+// global vars
+float data[4];
+float count = 0.0;
+
 BLEService dataService("1101");
 BLEFloatCharacteristic humidCharacteristic("2A6F", BLERead | BLENotify);
 BLEFloatCharacteristic tempCharacteristic("2A6E", BLERead | BLENotify);
 BLEFloatCharacteristic soilCharacteristic("272A", BLERead | BLENotify);
 BLEFloatCharacteristic lightCharacteristic("2730", BLERead | BLENotify);
-
-
-// global vars
-float data[4];
-float count = 0.0;
 
 
 // Functions
@@ -99,13 +98,13 @@ float read_light_sensor()
 
 void send_sensor_data(BLEDevice central, float data_arr[4])
 {
-    Serial.println("Sending Data:");
-    Serial.println(data_arr[0]);
-    Serial.println(data_arr[1]);
-    Serial.println(data_arr[2]);
-    Serial.println(data_arr[3]);
+    Serial.println("Sending Data...");
+//    Serial.println(data_arr[0]);
+//    Serial.println(data_arr[1]);
+//    Serial.println(data_arr[2]);
+//    Serial.println(data_arr[3]);
 
-    // send data to reciever
+    // send data to reciever via BLE client
     humidCharacteristic.setValue(data_arr[0]); // Set humidity value
     tempCharacteristic.setValue(data_arr[1]);  // Set temperature value
     soilCharacteristic.setValue(data_arr[2]);  // Set soil moisture value
@@ -138,11 +137,10 @@ void connection_handler(BLEDevice central)
           count++;
           delay(100);
 
-        } // keep looping while connected
+        } // looping while connected
         
         // when the central disconnects, turn off the LED:
         digitalWrite(LED_BUILTIN, LOW);
         Serial.print("Disconnected from central MAC: ");
         Serial.println(central.address());
-        count++;
 }

@@ -19,4 +19,5 @@ services:
     volumes:
       - "./:/code"
     env_file:
-      - store.env
+      - ./envs/store.env
+      - ./env/common.env

@@ -7,7 +7,7 @@ Course:  ELEC 3520
 """
 import os
 import sqlite3 as db
-from multiprocessing import Process, Queue
+from multiprocessing import Queue
 from data_retriever import DataRetriever
 
 
@@ -86,13 +86,6 @@ class StorageInterface:
         self.retriever.setup()
         self.store = StorageDB(os.environ.get("DB_LOCATION","./local-db/data/Sensors.db"))
         self.test = "it worked again!!"
-
-    def check_for_data(self):
-        while True:
-            if not self.retriever.data_read:
-                self.queue.put(self.retriever.get_data())
-            if not self.queue.empty():
-                self.store.save_msg(self.queue.pop())
 
     def on_message(self,client, userdata, msg):
         print(f"Message received. Topic: {msg.topic}. Payload: {msg.payload.decode('utf-8')}")

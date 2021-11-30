@@ -6,11 +6,12 @@ Author:  Michael Martinez
 Course:  ELEC 3520
 
 """
+import os
 from time import sleep
 import asyncio
 from bleak import BleakClient
 from struct import *
-# import paho.mqtt.client as mqtt
+import paho.mqtt.client as mqtt
 
 
 ADDRESS = "6d:65:61:d3:ca:be"
@@ -31,13 +32,13 @@ PREVIOUS_DATA = {
 def send_sensor_data(topic:str, payload:str):
     print(f"{topic:>20}: {payload.replace(',','|')}")
     # send to mqtt
-    # client = mqtt.Client(protocol=mqtt.MQTTv311)
-    # client.connect(host="localhost", port=1883)
-    # Counter = 40
-    # while True:
-    #     client.publish(topic=topic, payload=f"P001|{Counter}|100|ft")
-    #     sleep(10)
-    #     Counter += 2
+    client = mqtt.Client(protocol=mqtt.MQTTv311)
+    client.connect(host=os.environ.get("BROKER_HOST","localhost"),port=int(os.environ.get("BROKER_PORT",1883)))
+    Counter = 40
+    while True:
+        client.publish(topic=topic, payload=payload)
+        sleep(10)
+        Counter += 2
 
 
 

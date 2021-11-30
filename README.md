@@ -12,6 +12,7 @@
 [x] set-up sqlite3 database  
 [x] subscribe to local mosquitto pub/sub  
 [x] save incoming data to local sqlite3 db  
+[ ] visualize local data
 
 ## Analyze Data
 [ ] subscribe to local mosquitto pub/sub  
