@@ -32,7 +32,7 @@ class DataRetriever:
         self.data_read = True
         return self.current_data
 
-    def setup(self, topic="sensors/sensor/S01", func=None):
+    def setup(self, topic="sensors/plant/P01", func=None):
         def on_connect(client, userdata, flags, rc):
             print("Result from connect: {}".format(
                     mqtt.connack_string(rc)))    

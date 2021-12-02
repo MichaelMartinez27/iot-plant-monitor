@@ -14,10 +14,23 @@ services:
     hostname: py-storage
     container_name: py-storage
     build:
-      dockerfile: ./store.Dockerfile
+      dockerfile: ./containers/store.Dockerfile
       context: .
     volumes:
       - "./:/code"
     env_file:
-      - ./envs/store.env
-      - ./env/common.env
+      - "./envs/common.env"
+      - "./envs/store.env"
+  analyzer:
+    hostname: analyzer
+    container_name: analyzer
+    build:
+      dockerfile: containers/analyze.Dockerfile
+      context: .
+    volumes:
+      - "./:/code"
+    env_file:
+      - "./envs/common.env"
+      - "./envs/analyze.env"
+
+

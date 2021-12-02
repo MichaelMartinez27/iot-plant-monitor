@@ -7,7 +7,7 @@ Course:  ELEC 3520
 
 """
 import os
-from time import sleep
+from time import sleep, strftime
 import asyncio
 from bleak import BleakClient
 from struct import *
@@ -32,13 +32,16 @@ PREVIOUS_DATA = {
 def send_sensor_data(topic:str, payload:str):
     print(f"{topic:>20}: {payload.replace(',','|')}")
     # send to mqtt
-    client = mqtt.Client(protocol=mqtt.MQTTv311)
-    client.connect(host=os.environ.get("BROKER_HOST","localhost"),port=int(os.environ.get("BROKER_PORT",1883)))
-    Counter = 40
-    while True:
-        client.publish(topic=topic, payload=payload)
-        sleep(10)
-        Counter += 2
+    try:
+        client = mqtt.Client(protocol=mqtt.MQTTv311)
+        client.connect(host=os.environ.get("BROKER_HOST","localhost"),port=int(os.environ.get("BROKER_PORT",1883)))
+        # Counter = 40
+        # while True:
+        #     client.publish(topic=topic, payload=payload)
+        #     sleep(10)
+        #     Counter += 2
+    except Exception as err:
+        print("ERR|", err)
 
 
 
@@ -50,14 +53,15 @@ async def get_sensor_data(ADDRESS:str):
                 for svc in svcs:
                     if svc.description == "Serial Port":
                         for char in svc.characteristics:
+                            time = strftime('%Y%m%d%H%M')
                             char_uuid = char.uuid[4:8]
                             char_description = UUID_DESCRIPTORS[char_uuid]
                             data = await client.read_gatt_char(char.handle)
                             char_data = unpack('f',data)[0]
                             if data != PREVIOUS_DATA[char_uuid]:
                                 send_sensor_data(
-                                    f"sensors/sensor/{char_uuid}",
-                                    f"P001,{char_description:<5},{char_data}"
+                                    f"sensors/plant/P01",
+                                    f"{time},{char_uuid},{char_description:<5},{char_data:.2f}"
                                 )
                                 PREVIOUS_DATA[char_uuid] = data
                 sleep(1)
