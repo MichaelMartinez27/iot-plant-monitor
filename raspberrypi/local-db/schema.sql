@@ -4,8 +4,7 @@ CREATE TABLE IF NOT EXISTS Sensor_data (
 	plant_id TEXT NOT NULL,
 	sensor_id TEXT,
 	dt TEXT NOT NULL,
-	type TEXT NOT NULL,
-	value TEXT NOT NULL,
-    unit TEXT NOT NULL
+	value REAL NOT NULL,
+    type TEXT NOT NULL
 );
 

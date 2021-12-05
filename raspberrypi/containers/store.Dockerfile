@@ -1,6 +1,5 @@
 FROM python:3.9
 
-RUN pip install --upgrade --user pip
-RUN pip install --upgrade --user paho-mqtt
+RUN pip install --upgrade --user pip paho-mqtt flask plotly pandas
 
-CMD ["python","/code/data_storage.py"]
+CMD ["python","/code/data_visual.py"]

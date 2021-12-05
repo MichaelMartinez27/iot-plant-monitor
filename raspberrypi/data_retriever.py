@@ -34,12 +34,12 @@ class DataRetriever:
 
     def setup(self, topic="sensors/plant/P01", func=None):
         def on_connect(client, userdata, flags, rc):
-            print("Result from connect: {}".format(
+            print("LOG| Result from connect: {}".format(
                     mqtt.connack_string(rc)))    
             client.subscribe(topic)
 
         def on_subscribe(client, userdata, mid, granted_qos):    
-            print("I've subscribed")
+            print("LOG| I've subscribed")
 
         def on_message(client, userdata, msg):
             self.message_handler(msg, func)
@@ -49,10 +49,10 @@ class DataRetriever:
         self.client.on_message = on_message
 
 
-
     def run(self):
+        print(f"LOG| Attempting to subscribe to MQTT on {self.host}:{self.port}")
         self.client.connect(host=self.host,port=self.port)
-        print(f"Running subscription on {self.host}:{self.port}")
+        print(f"LOG| Running subscription on {self.host}:{self.port}")
         try:
             self.client.loop_forever()
         except KeyboardInterrupt:

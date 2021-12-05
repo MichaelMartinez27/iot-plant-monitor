@@ -11,12 +11,18 @@ on a mobile phone
 #define DHTTYPE DHT11
 #define PRPIN 3
 
-// global vars
-float previousData[4] = {0,0,0,0};
-float data[4];
-float count = 0.0;
+struct Data{
+  float humidity;
+  float temp;
+  float soil;
+  float light;
+};
 
-BLEService dataService("1101");
+// global vars
+struct Data previousData = {0,0,0,0};
+struct Data currentData = {-1,-1,-1,-1};
+
+BLEService dataService("A001");
 BLEFloatCharacteristic humidCharacteristic("2A6F", BLERead | BLENotify);
 BLEFloatCharacteristic tempCharacteristic("2A6E", BLERead | BLENotify);
 BLEFloatCharacteristic soilCharacteristic("272A", BLERead | BLENotify);
@@ -29,7 +35,7 @@ float read_humid_sensor();
 float read_temp_sensor();
 float read_soil_sensor();
 float read_light_sensor();
-void send_sensor_data(BLEDevice central,  float data_arr[4]);
+void send_sensor_data(BLEDevice central, struct Data data);
 void connection_handler(BLEDevice central);
 
 
@@ -55,10 +61,10 @@ void setup() {
     
     BLE.addService(dataService);                        // Add service
     
-    humidCharacteristic.setValue(-1.0);                 // Set humidity initial value
-    tempCharacteristic.setValue(-1.0);                  // Set temperature initial value
-    soilCharacteristic.setValue(-1.0);                  // Set soil moisture initial value
-    lightCharacteristic.setValue(-1.0);                 // Set light initial value
+    humidCharacteristic.setValue(currentData.humidity);                 // Set humidity initial value
+    tempCharacteristic.setValue(currentData.temp);                  // Set temperature initial value
+    soilCharacteristic.setValue(currentData.soil);                  // Set soil moisture initial value
+    lightCharacteristic.setValue(currentData.light);                 // Set light initial value
 
     dht.begin();                                        // Start DHT11 service
     BLE.advertise();                                    // Start advertising
@@ -84,65 +90,65 @@ void loop()
 float read_humid_sensor()
 {
   float h = dht.readHumidity();
-  if(abs((int)h - (int)previousData[0]) > 5) 
+  if(abs((int)h - (int)previousData.humidity) > 5) 
   {
-    previousData[0] = h;
+    previousData.humidity = h;
     return h;
   }
-  return previousData[0];
+  return previousData.humidity;
 }
 
 
 float read_temp_sensor()
 {
   float t = dht.readTemperature(true);
-  if(abs((int)t - (int)previousData[1]) > 1){
-    previousData[1] = t;
+  if(abs((int)t - (int)previousData.temp) > 1){
+    previousData.temp = t;
     return t;
   }
-  return previousData[1];
+  return previousData.temp;
 }
 
 
 float read_soil_sensor()
 {
   float s  = analogRead(A1);
-  if(abs((int)s - (int)previousData[2]) > 100){
-    previousData[2] = s;
+  if(abs((int)s - (int)previousData.soil) > 100){
+    previousData.soil = s;
     return s;
   }
-  return previousData[2];
+  return previousData.soil;
 }
 
 
 float read_light_sensor()
 {
   float L  = analogRead(A0);
-  if(abs((int)L - (int)previousData[3]) > 200){
-    previousData[3] = L;
+  if(abs((int)L - (int)previousData.light) > 200){
+    previousData.light = L;
     return L;
   }
-  return previousData[3];
+  return previousData.light;
 }
 
 
-void send_sensor_data(BLEDevice central, float data_arr[4])
+void send_sensor_data(BLEDevice central, struct Data data)
 {
     Serial.println("Sending Data...");
-    Serial.print(data_arr[0]);
+    Serial.print(data.humidity);
     Serial.print(", ");
-    Serial.print(data_arr[1]);
+    Serial.print(data.temp);
     Serial.print(", ");
-    Serial.print(data_arr[2]);
+    Serial.print(data.soil);
     Serial.print(", ");
-    Serial.print(data_arr[3]);
+    Serial.print(data.light);
     Serial.print("\n");
 
     // send data to reciever via BLE client
-    humidCharacteristic.setValue(data_arr[0]); // Set humidity value
-    tempCharacteristic.setValue(data_arr[1]);  // Set temperature value
-    soilCharacteristic.setValue(data_arr[2]);  // Set soil moisture value
-    lightCharacteristic.setValue(data_arr[3]); // Set light value
+    humidCharacteristic.setValue(data.humidity); // Set humidity value
+    tempCharacteristic.setValue(data.temp);  // Set temperature value
+    soilCharacteristic.setValue(data.soil);  // Set soil moisture value
+    lightCharacteristic.setValue(data.light); // Set light value
 
 }
 
@@ -160,14 +166,13 @@ void connection_handler(BLEDevice central)
         while (central.connected())
         {
       
-          data[0] = read_humid_sensor();
-          data[1] = read_temp_sensor();
-          data[2] = read_soil_sensor();
-          data[3] = read_light_sensor();
+          currentData.humidity = read_humid_sensor();
+          currentData.temp = read_temp_sensor();
+          currentData.soil = read_soil_sensor();
+          currentData.light = read_light_sensor();
   
-          send_sensor_data(central, data);  
+          send_sensor_data(central, currentData);  
 
-          count++;
           delay(100);
 
         } // looping while connected
