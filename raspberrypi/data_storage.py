@@ -27,7 +27,7 @@ class StorageDB:
         try:
             self.conn = db.connect(db_file, check_same_thread=False)
             self.cursor = self.conn.cursor()
-            print(db.version)
+            print(f"LOG| sqlite3 version: {db.version}")
         except db.Error as err:
             print(f"ERROR|{'__init__':^15}|", err)
 
@@ -85,13 +85,9 @@ VALUES (
             print(f"ERR|", err)
             return []
 
-
-
-
 class StorageInterface(Thread):
     retriever: DataRetriever
     store: StorageDB
-    queue: Queue
 
     def __init__(self) -> None:
         super().__init__()

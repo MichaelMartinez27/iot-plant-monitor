@@ -19,8 +19,8 @@ struct Data{
 };
 
 // global vars
-struct Data previousData = {0,0,0,0};
-struct Data currentData = {-1,-1,-1,-1};
+struct Data previousData = {-1,-1,-1,-1};
+struct Data currentData = {0,0,0,0};
 
 BLEService dataService("A001");
 BLEFloatCharacteristic humidCharacteristic("2A6F", BLERead | BLENotify);
@@ -41,7 +41,7 @@ void connection_handler(BLEDevice central);
 
 void setup() {
     Serial.begin(9600); // initialize serial communication
-    while (!Serial);
+    // while (!Serial);
 
     pinMode(LED_BUILTIN, OUTPUT); // initialize the built-in LED pin
     
@@ -134,16 +134,18 @@ float read_light_sensor()
 
 void send_sensor_data(BLEDevice central, struct Data data)
 {
-    Serial.println("Sending Data...");
-    Serial.print(data.humidity);
-    Serial.print(", ");
-    Serial.print(data.temp);
-    Serial.print(", ");
-    Serial.print(data.soil);
-    Serial.print(", ");
-    Serial.print(data.light);
-    Serial.print("\n");
-
+    /*
+     Serial.println("Sending Data...");
+     Serial.print(data.humidity);
+     Serial.print(", ");
+     Serial.print(data.temp);
+     Serial.print(", ");
+     Serial.print(data.soil);
+     Serial.print(", ");
+     Serial.print(data.light);
+     Serial.print("\n");
+    */
+    
     // send data to reciever via BLE client
     humidCharacteristic.setValue(data.humidity); // Set humidity value
     tempCharacteristic.setValue(data.temp);  // Set temperature value

@@ -1,6 +1,3 @@
-import socket
-import os
-import sqlite3 as db
 from flask import Flask, render_template
 from data_storage import StorageInterface
 from threading import Thread
@@ -23,58 +20,73 @@ class DataVisualizer(Thread):
 
         @app.route("/")
         def plot_all_data():
-            conn = self.si.store.conn
-            data = pd.read_sql_query("SELECT * FROM Sensor_data", conn)
-            data['value']= pd.to_numeric(data['value'])
-            data['dt']= pd.to_datetime(data['dt'])
-            fig = px.line(data,x="dt",y="value",color="type")
-            graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-            return render_template('all_plots.html', sensor="All sensors", graphJSON=graphJSON)
+            try:
+                conn = self.si.store.conn
+                data = pd.read_sql_query("SELECT * FROM Sensor_data", conn)
+                data['value']= pd.to_numeric(data['value'])
+                data['dt']= pd.to_datetime(data['dt'])
+                fig = px.line(data,x="dt",y="value",color="type")
+                graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+                return render_template('all_plots.html', sensor="All sensors", graphJSON=graphJSON)
+            except Exception as err:
+                print("ERR|", err)
+                return {"ERR":"Could not recieve data. See logs for more info."}
 
         @app.route("/humidity")
         def plot_humidity():
-            conn = self.si.store.conn
-            data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='HUMID'", conn)
-            fig = px.line(data,x="dt",y="value")
-            graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-            return render_template('all_plots.html', sensor="Humidity", graphJSON=graphJSON)
+            try:
+                conn = self.si.store.conn
+                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='HUMID'", conn)
+                data['value']= pd.to_numeric(data['value'])
+                data['dt']= pd.to_datetime(data['dt'])
+                fig = px.line(data,x="dt",y="value")
+                graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+                return render_template('all_plots.html', sensor="Humidity", graphJSON=graphJSON)
+            except Exception as err:
+                print("ERR|", err)
+                return {"ERR":"Could not recieve data. See logs for more info."}
 
         @app.route("/temp")
         def plot_temp():
-            conn = self.si.store.conn
-            data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='TEMP '", conn)
-            fig = px.line(data,x="dt",y="value")
-            graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-            return render_template('all_plots.html', sensor="Temperature", graphJSON=graphJSON)
+            try:
+                conn = self.si.store.conn
+                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='TEMP'", conn)
+                data['value']= pd.to_numeric(data['value'])
+                data['dt']= pd.to_datetime(data['dt'])
+                fig = px.line(data,x="dt",y="value")
+                graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+                return render_template('all_plots.html', sensor="Temperature", graphJSON=graphJSON)
+            except Exception as err:
+                print("ERR|", err)
+                return {"ERR":"Could not recieve data. See logs for more info."}
 
         @app.route("/soil")
         def plot_soil():
-            conn = self.si.store.conn
-            data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='SOIL '", conn)
-            fig = px.line(data,x="dt",y="value")
-            graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-            return render_template('all_plots.html', sensor="Soil moisture", graphJSON=graphJSON)
+            try:
+                conn = self.si.store.conn
+                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='SOIL'", conn)
+                data['value']= pd.to_numeric(data['value'])
+                data['dt']= pd.to_datetime(data['dt'])
+                fig = px.line(data,x="dt",y="value")
+                graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+                return render_template('all_plots.html', sensor="Soil moisture", graphJSON=graphJSON)
+            except Exception as err:
+                print("ERR|", err)
+                return {"ERR":"Could not recieve data. See logs for more info."}
 
         @app.route("/light")
         def plot_light():
-            conn = self.si.store.conn
-            data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='LIGHT'", conn)
-            fig = px.line(data,x="dt",y="value")
-            graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-            return render_template('all_plots.html', sensor="Light intesity", graphJSON=graphJSON)
-
-        @app.route('/plotly')
-        def notdash():
-            df = pd.DataFrame({
-                'Fruit': ['Apples', 'Oranges', 'Bananas', 'Apples', 'Oranges', 
-                'Bananas'],
-                'Amount': [4, 1, 2, 2, 4, 5],
-                'City': ['SF', 'SF', 'SF', 'Montreal', 'Montreal', 'Montreal']
-            })
-            fig = px.bar(df, x='Fruit', y='Amount', color='City', 
-            barmode='group')   
-            graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-            return render_template('all_plots.html', graphJSON=graphJSON)
+            try:
+                conn = self.si.store.conn
+                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='LIGHT'", conn)
+                data['value']= pd.to_numeric(data['value'])
+                data['dt']= pd.to_datetime(data['dt'])
+                fig = px.line(data,x="dt",y="value")
+                graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+                return render_template('all_plots.html', sensor="Light intesity", graphJSON=graphJSON)
+            except Exception as err:
+                print("ERR|", err)
+                return {"ERR":"Could not recieve data. See logs for more info."}
 
         return app
     

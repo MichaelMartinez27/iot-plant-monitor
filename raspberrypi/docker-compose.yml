@@ -17,7 +17,7 @@ services:
       dockerfile: ./containers/store.Dockerfile
       context: .
     ports:
-      - 5000:5000
+      - 80:5000
     volumes:
       - "./:/code"
     env_file:

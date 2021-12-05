@@ -31,13 +31,13 @@ PREVIOUS_DATA = {
 }
 
 
-def send_sensor_data(topic:str, payload:str):
+def publish_sensor_data(topic:str, payload:str):
     print(f"{topic:>20}: {payload.replace(',', '|')}")
     # send to mqtt
     try:
         client = mqtt.Client(protocol=mqtt.MQTTv311)
         client.connect(host=os.environ.get("BROKER_HOST","localhost"),port=int(os.environ.get("BROKER_PORT",1883)))
-        client.publish(topic=topic, payload=payload)
+        client.publish(topic=topic, payload=payload.replace(" ",""))
     except Exception as err:
         print("ERR|", err)
 
@@ -58,8 +58,8 @@ async def get_sensor_data(ADDRESS:str):
                         data = await client.read_gatt_char(char.handle)
                         char_data = unpack('f',data)[0]
                         if data != PREVIOUS_DATA[char_uuid]:
-                            send_sensor_data(
-                                f"sensors/plant/P01",
+                            publish_sensor_data(
+                                f"sensors/plant/{svc_uuid}",
                                 f"{time},{char_uuid},{char_description:<5},{char_data:.2f}"
                             )
                             PREVIOUS_DATA[char_uuid] = data
@@ -67,16 +67,22 @@ async def get_sensor_data(ADDRESS:str):
 
 
 def main():
-    try:
-        asyncio.run(get_sensor_data(ADDRESS))
-    except KeyboardInterrupt:
-        print("LOG| ending sensor data retrieval.")
-    except BleakError as err:
-        print("ERR|", err)
-    except asyncio.exceptions.InvalidStateError as err:
-        print("ERR|", err)
-    except asyncio.exceptions.TimeoutError as err:
-        print("ERR|", err)
+    while True:
+        try:
+            asyncio.run(get_sensor_data(ADDRESS))
+        except KeyboardInterrupt:
+            print("LOG| ending sensor data retrieval.")
+            break
+        except OSError as err:
+            print("ERR|", err)
+        except BleakError as err:
+            print("ERR|", err)
+        except asyncio.exceptions.InvalidStateError as err:
+            print("ERR|", err)
+            break
+        except asyncio.exceptions.TimeoutError as err:
+            print("ERR|", err)
+            break
 
 
 if __name__ == "__main__":
