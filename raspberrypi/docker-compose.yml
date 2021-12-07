@@ -13,9 +13,7 @@ services:
   db:
     hostname: py-storage
     container_name: py-storage
-    build:
-      dockerfile: ./containers/store.Dockerfile
-      context: .
+    image: mixedmachine/iot-plant-store-vis:1.0.0-slim
     ports:
       - 80:5000
     volumes:
