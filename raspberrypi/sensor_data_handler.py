@@ -42,28 +42,42 @@ def publish_sensor_data(topic:str, payload:str):
         print("ERR|", err)
 
 
-
 async def get_sensor_data(ADDRESS:str):
-    async with BleakClient(ADDRESS) as client:
-        svcs = await client.get_services()
-        print("LOG| Looking for device to connect to...")
-        while True:
-            for svc in svcs:
-                svc_uuid = svc.uuid.split('-')[0][4:]
-                if re.match("[a-fA-F]00[\d]", svc_uuid):
-                    for char in svc.characteristics:
-                        time = strftime('%Y%m%d%H%M')
-                        char_uuid = char.uuid[4:8]
-                        char_description = UUID_DESCRIPTORS[char_uuid]
-                        data = await client.read_gatt_char(char.handle)
-                        char_data = unpack('f',data)[0]
-                        if data != PREVIOUS_DATA[char_uuid]:
-                            publish_sensor_data(
-                                f"sensors/plant/{svc_uuid}",
-                                f"{time},{char_uuid},{char_description:<5},{char_data:.2f}"
-                            )
-                            PREVIOUS_DATA[char_uuid] = data
-            sleep(1)
+    while True:
+        async with BleakClient(ADDRESS) as client:
+            try:
+                svcs = await client.get_services()
+                print("LOG| Looking for device to connect to...")
+                for svc in svcs:
+                    svc_uuid = svc.uuid.split('-')[0][4:]
+                    if re.match("[a-fA-F]00[\d]", svc_uuid):
+                        for char in svc.characteristics:
+                            time = strftime('%Y%m%d%H%M')
+                            char_uuid = char.uuid[4:8]
+                            char_description = UUID_DESCRIPTORS[char_uuid]
+                            data = await client.read_gatt_char(char.handle)
+                            char_data = unpack('f',data)[0]
+                            if data != PREVIOUS_DATA[char_uuid]:
+                                publish_sensor_data(
+                                    f"sensors/plant/{svc_uuid}",
+                                    f"{time},{char_uuid},{char_description:<5},{char_data:.2f}"
+                                )
+                                PREVIOUS_DATA[char_uuid] = data
+                sleep(1)
+            except Exception as err:
+                print("ERR|", err)
+            except KeyboardInterrupt:
+                raise KeyboardInterrupt
+            except OSError as err:
+                raise OSError
+            except BleakError as err:
+                raise BleakError
+            except asyncio.exceptions.InvalidStateError as err:
+                raise asyncio.exceptions.InvalidStateError
+            except asyncio.exceptions.TimeoutError as err:
+                raise asyncio.exceptions.TimeoutError
+            finally:
+                client.disconnect()
 
 
 def main():
