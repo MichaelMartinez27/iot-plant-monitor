@@ -23,12 +23,12 @@ class DataVisualizer(Thread):
         def plot_all_data():
             try:
                 conn = self.si.store.conn
-                data = pd.read_sql_query("SELECT * FROM Sensor_data", conn)
+                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE value IS NOT NULL", conn)
                 data.dropna(axis="index",how="any",inplace=True)
-                # data['value']= pd.to_numeric(data['value'])
-                # data['dt']= pd.to_datetime(data['dt'])
-                # fig = px.line(data,x="dt",y="value",color="type")
-                # graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+                data['value']= pd.to_numeric(data['value'])
+                data['dt']= pd.to_datetime(data['dt'])
+                fig = px.line(data,x="dt",y="value",color="type")
+                graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
                 return render_template('all_plots.html', sensor="All sensors", graphJSON=graphJSON)
             except Exception as err:
                 print("DBG|", err, file=sys.stdout)
@@ -39,7 +39,7 @@ class DataVisualizer(Thread):
         def get_all_data():
             try:
                 conn = self.si.store.conn
-                data = pd.read_sql_query("SELECT * FROM Sensor_data", conn)
+                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE value IS NOT NULL", conn)
                 data['value']= pd.to_numeric(data['value'])
                 data.dropna(axis="index",how="any",inplace=True)
                 return data.to_dict()
@@ -52,7 +52,7 @@ class DataVisualizer(Thread):
         def plot_humidity():
             try:
                 conn = self.si.store.conn
-                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='HUMID'", conn)
+                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='HUMID' AND  value IS NOT NULL", conn)
                 data['value']= pd.to_numeric(data['value'])
                 data['dt']= pd.to_datetime(data['dt'])
                 data.dropna(axis="index",how="any",inplace=True)
@@ -68,7 +68,7 @@ class DataVisualizer(Thread):
         def plot_temp():
             try:
                 conn = self.si.store.conn
-                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='TEMP'", conn)
+                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='TEMP' AND  value IS NOT NULL", conn)
                 data['value']= pd.to_numeric(data['value'])
                 data['dt']= pd.to_datetime(data['dt'])
                 data.dropna(axis="index",how="any",inplace=True)
@@ -84,7 +84,7 @@ class DataVisualizer(Thread):
         def plot_soil():
             try:
                 conn = self.si.store.conn
-                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='SOIL'", conn)
+                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='SOIL' AND  value IS NOT NULL", conn)
                 data['value']= pd.to_numeric(data['value'])
                 data['dt']= pd.to_datetime(data['dt'])
                 data.dropna(axis="index",how="any",inplace=True)
@@ -100,7 +100,7 @@ class DataVisualizer(Thread):
         def plot_light():
             try:
                 conn = self.si.store.conn
-                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='LIGHT'", conn)
+                data = pd.read_sql_query("SELECT * FROM Sensor_data WHERE type='LIGHT' AND  value IS NOT NULL", conn)
                 data['value']= pd.to_numeric(data['value'])
                 data['dt']= pd.to_datetime(data['dt'])
                 data.dropna(axis="index",how="any",inplace=True)
