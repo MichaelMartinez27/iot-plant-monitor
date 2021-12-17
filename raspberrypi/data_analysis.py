@@ -92,7 +92,7 @@ class DataAnalysis:
     def __init__(self) -> None:
         self._current_data = PlantSensorData()
         self._current_result = None
-        self.anom = setup(data=df_train, silent=True)
+        self.anom = setup(data=self.get_training_data(), silent=True)
         self.__model = create_model(model='iforest', fraction=0.05)
 
     @property
@@ -102,6 +102,14 @@ class DataAnalysis:
         if self.result is None:
             return self.analyze_data()
         return self._current_result
+
+    def get_training_data(self):
+        response = requests.get("py-storage:5000/json")
+        data = dict(response.text)
+        if "ERR" not in data.keys():
+            return pd.DataFrame(data)
+        else:
+            raise ValueError
 
     def parse_message(self, msg) -> None:
         """
