@@ -5,6 +5,7 @@ import pandas as pd
 import json
 import plotly
 import plotly.express as px
+import sys
 
 class DataVisualizer(Thread):
     si: StorageInterface
@@ -30,7 +31,8 @@ class DataVisualizer(Thread):
                 graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
                 return render_template('all_plots.html', sensor="All sensors", graphJSON=graphJSON)
             except Exception as err:
-                print("ERR|", err)
+                print("DBG|", err, file=sys.stdout)
+                print("ERR|", err, file=sys.stderr)
                 return {"ERR":"Could not recieve data. See logs for more info."}
 
         @app.route("/json")
@@ -42,7 +44,8 @@ class DataVisualizer(Thread):
                 data.dropna(axis="index",how="any",inplace=True)
                 return data.to_dict()
             except Exception as err:
-                print("ERR|", err)
+                print("DBG|", err, file=sys.stdout)
+                print("ERR|", err, file=sys.stderr)
                 return {"ERR":"Could not recieve data. See logs for more info."}
 
         @app.route("/humidity")
@@ -57,7 +60,8 @@ class DataVisualizer(Thread):
                 graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
                 return render_template('all_plots.html', sensor="Humidity", graphJSON=graphJSON)
             except Exception as err:
-                print("ERR|", err)
+                print("DBG|", err, file=sys.stdout)
+                print("ERR|", err, file=sys.stderr)
                 return {"ERR":"Could not recieve data. See logs for more info."}
 
         @app.route("/temp")
@@ -72,7 +76,8 @@ class DataVisualizer(Thread):
                 graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
                 return render_template('all_plots.html', sensor="Temperature", graphJSON=graphJSON)
             except Exception as err:
-                print("ERR|", err)
+                print("DBG|", err, file=sys.stdout)
+                print("ERR|", err, file=sys.stderr)
                 return {"ERR":"Could not recieve data. See logs for more info."}
 
         @app.route("/soil")
@@ -87,7 +92,8 @@ class DataVisualizer(Thread):
                 graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
                 return render_template('all_plots.html', sensor="Soil moisture", graphJSON=graphJSON)
             except Exception as err:
-                print("ERR|", err)
+                print("DBG|", err, file=sys.stdout)
+                print("ERR|", err, file=sys.stderr)
                 return {"ERR":"Could not recieve data. See logs for more info."}
 
         @app.route("/light")
@@ -102,7 +108,8 @@ class DataVisualizer(Thread):
                 graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
                 return render_template('all_plots.html', sensor="Light intesity", graphJSON=graphJSON)
             except Exception as err:
-                print("ERR|", err)
+                print("DBG|", err, file=sys.stdout)
+                print("ERR|", err, file=sys.stderr)
                 return {"ERR":"Could not recieve data. See logs for more info."}
 
         return app
