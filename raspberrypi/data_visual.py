@@ -32,6 +32,17 @@ class DataVisualizer(Thread):
                 print("ERR|", err)
                 return {"ERR":"Could not recieve data. See logs for more info."}
 
+        @app.route("/json")
+        def plot_all_data():
+            try:
+                conn = self.si.store.conn
+                data = pd.read_sql_query("SELECT * FROM Sensor_data", conn)
+                data['value']= pd.to_numeric(data['value'])
+                return data.to_dict()
+            except Exception as err:
+                print("ERR|", err)
+                return {"ERR":"Could not recieve data. See logs for more info."}
+
         @app.route("/humidity")
         def plot_humidity():
             try:

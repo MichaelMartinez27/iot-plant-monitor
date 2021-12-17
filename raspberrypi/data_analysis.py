@@ -7,7 +7,10 @@ Course:  ELEC 3520
 """
 import os
 from data_retriever import DataRetriever
+import pandas as pd
 from results_handler import send_result
+from pycaret.anomaly import *
+from sklearn.datasets import load_breast_cancer
 
 
 class PlantSensorData:
@@ -59,6 +62,20 @@ class PlantSensorData:
     def light(self, light:float):
         self._light = light
 
+    def as_df(self):
+        return pd.DataFrame(self.__dict__())
+
+    def __repr__(self):
+        return f"""{
+"humidity":    {self._humidity},
+"temperature": {self._temperature},
+"soil":        {self._soil},
+"light":       {self._light}
+}"""
+
+    def __dict__(self):
+        return dict(self.__repr__())
+
     def data_available(self):
         return {
             "humidity":    self._humidity is not None,
@@ -75,6 +92,8 @@ class DataAnalysis:
     def __init__(self) -> None:
         self._current_data = PlantSensorData()
         self._current_result = None
+        self.anom = setup(data=df_train, silent=True)
+        self.__model = create_model(model='iforest', fraction=0.05)
 
     @property
     def result(self) -> float:
@@ -84,15 +103,27 @@ class DataAnalysis:
             return self.analyze_data()
         return self._current_result
 
-    def parse_message(self) -> None:
+    def parse_message(self, msg) -> None:
         """
         updates data based on message. If current data has all
         attributes filled, will analyze data
         """
-        pass
+        message = msg.split(",")
+        type = msg[-2]
+        value =msg[-1]
+        if type == "HUMID":
+            self._current_data.humidity = value
+        elif type == "TEMP":
+            self._current_data.temperature = value
+        elif type == "SOIL":
+            self._current_data.soil = value
+        elif type == "LIGHT":
+            self._current_data.light = value
 
     def analyze_data(self) -> float:
-        pass
+        if all(self._current_data.data_available().values()):
+            self.__model.predict(self._current_data.as_df())
+
 
 class DataAnalysisInterface:
     retriever: DataRetriever
@@ -103,18 +134,39 @@ class DataAnalysisInterface:
         self.retriever.setup()
         self.analyst = DataAnalysis()
 
+
     def on_message(self,client, userdata, msg) -> None:
         print(f"LOG| Message received. Topic: {msg.topic}. Payload: {msg.payload.decode('utf-8')}")
         self.analyst.parse_message(msg)
         try:
             self.analyst.analyze_data()
-            send_result(self.analyst.result)
+            send_result()
             print("LOG| Data analyzed and sent to MQTT")
         except ValueError as ve:
             print("LOG|", ve)
         except Exception as err:
             print("ERR|", err)
 
+    def send_data(self)
+        print(f"ANOMOLY| {self.analyst._current_data} -> {bool(self.analyst.result)}")
+
     def run(self) -> None:
         self.retriever.client.on_message = self.on_message
         self.retriever.run()
+
+
+def test():
+    df = load_breast_cancer(as_frame=True)['data']
+    df_train = df.iloc[:-10]
+    df_unseen = df.tail(10)
+
+    anom = setup(data=df_train, silent=True)
+
+    anom_model = create_model(model='iforest', fraction=0.05)
+    # results = assign_model(anom_model)
+    print(df_unseen)
+    print(anom_model.predict(df_unseen))
+
+if __name__ == '__main__':
+    si = StorageInterface()
+    si.run()
