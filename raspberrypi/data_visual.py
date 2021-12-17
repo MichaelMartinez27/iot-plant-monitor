@@ -34,7 +34,7 @@ class DataVisualizer(Thread):
                 return {"ERR":"Could not recieve data. See logs for more info."}
 
         @app.route("/json")
-        def plot_all_data():
+        def get_all_data():
             try:
                 conn = self.si.store.conn
                 data = pd.read_sql_query("SELECT * FROM Sensor_data", conn)
