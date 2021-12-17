@@ -8,9 +8,10 @@ Course:  ELEC 3520
 import os
 from data_retriever import DataRetriever
 import pandas as pd
+import requests
 from results_handler import send_result
 from pycaret.anomaly import *
-from sklearn.datasets import load_breast_cancer
+from sklearn.ensemble import IsolationForest
 
 
 class PlantSensorData:
@@ -92,8 +93,9 @@ class DataAnalysis:
     def __init__(self) -> None:
         self._current_data = PlantSensorData()
         self._current_result = None
-        self.anom = setup(data=self.get_training_data(), silent=True)
-        self.__model = create_model(model='iforest', fraction=0.05)
+        rng = np.random.RandomState(42)
+        self.__model = IsolationForest(random_state=rng)
+        self.__model.fit(self.get_training_data())
 
     @property
     def result(self) -> float:
@@ -107,7 +109,7 @@ class DataAnalysis:
         response = requests.get("py-storage:5000/json")
         data = dict(response.text)
         if "ERR" not in data.keys():
-            return pd.DataFrame(data)
+            return pd.DataFrame(data).to_numpy()
         else:
             raise ValueError
 
@@ -155,7 +157,7 @@ class DataAnalysisInterface:
         except Exception as err:
             print("ERR|", err)
 
-    def send_data(self)
+    def send_data(self):
         print(f"ANOMOLY| {self.analyst._current_data} -> {bool(self.analyst.result)}")
 
     def run(self) -> None:
@@ -163,18 +165,7 @@ class DataAnalysisInterface:
         self.retriever.run()
 
 
-def test():
-    df = load_breast_cancer(as_frame=True)['data']
-    df_train = df.iloc[:-10]
-    df_unseen = df.tail(10)
-
-    anom = setup(data=df_train, silent=True)
-
-    anom_model = create_model(model='iforest', fraction=0.05)
-    # results = assign_model(anom_model)
-    print(df_unseen)
-    print(anom_model.predict(df_unseen))
 
 if __name__ == '__main__':
-    si = StorageInterface()
-    si.run()
+    dai = DataAnalysisInterface()
+    dai.run()
