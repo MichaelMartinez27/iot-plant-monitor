@@ -25,10 +25,10 @@ class DataVisualizer(Thread):
                 conn = self.si.store.conn
                 data = pd.read_sql_query("SELECT * FROM Sensor_data", conn)
                 data.dropna(axis="index",how="any",inplace=True)
-                data['value']= pd.to_numeric(data['value'])
-                data['dt']= pd.to_datetime(data['dt'])
-                fig = px.line(data,x="dt",y="value",color="type")
-                graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+                # data['value']= pd.to_numeric(data['value'])
+                # data['dt']= pd.to_datetime(data['dt'])
+                # fig = px.line(data,x="dt",y="value",color="type")
+                # graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
                 return render_template('all_plots.html', sensor="All sensors", graphJSON=graphJSON)
             except Exception as err:
                 print("DBG|", err, file=sys.stdout)
