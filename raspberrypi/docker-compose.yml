@@ -13,22 +13,22 @@ services:
   db:
     hostname: py-storage
     container_name: py-storage
-    image: mixedmachine/iot-plant-store-vis:1.0.0-slim
+    image: mixedmachine/iot-plant-store-vis:1.0.0-arm
     ports:
-      - 80:5000
+      - 0.0.0.0:8080:5000
     volumes:
       - "./:/code"
     env_file:
       - "./envs/common.env"
       - "./envs/store.env"
-  analyzer:
-    hostname: analyzer
-    container_name: analyzer
-    build:
-      dockerfile: containers/analyze.Dockerfile
-      context: .
-    volumes:
-      - "./:/code"
-    env_file:
-      - "./envs/common.env"
-      - "./envs/analyze.env"
+#  analyzer:
+#    hostname: analyzer
+#    container_name: analyzer
+#    build:
+#      dockerfile: containers/analyze.Dockerfile
+#      context: .
+#    volumes:
+#      - "./:/code"
+#    env_file:
+#      - "./envs/common.env"
+#      - "./envs/analyze.env"
