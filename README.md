@@ -2,7 +2,7 @@
 # IoT Plant Monitor
 
 ## Bluetooth Sensor Data
-[ ] arduino sensors set-up  
+[x] arduino sensors set-up  
 [x] arduino BLE sending data  
 [x] recieve sensor data via python bluetooth  
 [x] publish sensor data to local mosquitto pub/sub  
@@ -12,11 +12,8 @@
 [x] set-up sqlite3 database  
 [x] subscribe to local mosquitto pub/sub  
 [x] save incoming data to local sqlite3 db  
-[ ] visualize local data
+[x] visualize local data
 
 ## Analyze Data
-[ ] subscribe to local mosquitto pub/sub  
-[ ] Analysis algorithm  
-[ ] results get handled and sends results to ubidots  
-[ ] ubidot sends notification when anomoly is detected  
-
+[x] subscribe to local mosquitto pub/sub  
+[x] Analysis algorithm  
